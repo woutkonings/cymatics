@@ -117,17 +117,28 @@ function initAudio() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         // Create a master gain node that stays constant
         gainNode = audioContext.createGain();
-        gainNode.gain.value = 0.1; // Lower volume to prevent distortion
+        gainNode.gain.value = 0.05; // Reduced from 0.1 to prevent distortion
         gainNode.connect(audioContext.destination);
     }
 }
 
 function createOscillator(frequency) {
     const osc = audioContext.createOscillator();
+    const noteGain = audioContext.createGain();
+    
+    // Configure oscillator
     osc.type = 'sine';
     osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
-    osc.connect(gainNode);
-    return osc;
+    
+    // Configure note-specific gain for envelope
+    noteGain.gain.setValueAtTime(0, audioContext.currentTime);
+    noteGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.02); // Gentle attack
+    
+    // Connect oscillator through note gain to master gain
+    osc.connect(noteGain);
+    noteGain.connect(gainNode);
+    
+    return { oscillator: osc, noteGain: noteGain };
 }
 
 function playNote(note) {
@@ -135,13 +146,17 @@ function playNote(note) {
     
     // Stop previous note if any
     if (activeOscillator) {
-        activeOscillator.stop();
-        activeOscillator = null;
+        stopNote();
     }
 
     const frequency = NOTES[note].freq;
-    activeOscillator = createOscillator(frequency);
-    activeOscillator.start();
+    const { oscillator, noteGain } = createOscillator(frequency);
+    activeOscillator = { 
+        oscillator: oscillator, 
+        noteGain: noteGain 
+    };
+    
+    oscillator.start();
     isPlaying = true;
     activeNote = note;
 
@@ -151,7 +166,15 @@ function playNote(note) {
 
 function stopNote() {
     if (activeOscillator) {
-        activeOscillator.stop();
+        const { oscillator, noteGain } = activeOscillator;
+        
+        // Gentle release to prevent clicking
+        const releaseTime = audioContext.currentTime + 0.05;
+        noteGain.gain.linearRampToValueAtTime(0, releaseTime);
+        
+        // Schedule the oscillator to stop after the release
+        oscillator.stop(releaseTime);
+        
         activeOscillator = null;
         isPlaying = false;
         
@@ -256,7 +279,7 @@ function animate() {
     controls.update();
     
     // Calculate m and n from the current oscillator frequency
-    const frequency = activeOscillator ? activeOscillator.frequency.value : 440;
+    const frequency = activeOscillator ? activeOscillator.oscillator.frequency.value : 440;
     const minFrequency = 130.81;  // C3
     const maxFrequency = 1244.51; // D#6
     const scaleFactor = 2; // Controls how fast complexity increases with frequency

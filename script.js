@@ -232,7 +232,103 @@ function updateParticles(m, n) {
     particles.geometry.attributes.position.needsUpdate = true;
 }
 
-// Modify init() to include keyboard creation
+// Add these functions after the NOTES definition and before init()
+
+function generateLetterW(centerX, centerY, width, height, thickness) {
+    const points = [];
+    const segments = 50;
+    
+    function addLinePoints(x1, y1, x2, y2, count) {
+        for (let i = 0; i < count; i++) {
+            const t = i / (count - 1);
+            const randX = (Math.random() - 0.5) * thickness;
+            const randY = (Math.random() - 0.5) * thickness;
+            points.push({
+                x: x1 + (x2 - x1) * t + randX,
+                y: y1 + (y2 - y1) * t + randY
+            });
+        }
+    }
+    
+    // Define points for two V shapes
+    const leftX = centerX - width/2;
+    const rightX = centerX + width/2;
+    const topY = centerY + height/2;
+    const bottomY = centerY - height/2;
+    
+    // First V (left side)
+    const v1Center = centerX - width/4;
+    addLinePoints(leftX, topY, v1Center, bottomY, segments); // Left diagonal
+    addLinePoints(v1Center, bottomY, centerX, topY, segments); // Right diagonal
+    
+    // Second V (right side)
+    const v2Center = centerX + width/4;
+    addLinePoints(centerX, topY, v2Center, bottomY, segments); // Left diagonal
+    addLinePoints(v2Center, bottomY, rightX, topY, segments); // Right diagonal
+    
+    // Add extra points at the intersections for better definition
+    const intersectionPoints = [
+        { x: centerX, y: topY },      // Middle top
+        { x: v1Center, y: bottomY },  // Left bottom
+        { x: v2Center, y: bottomY }   // Right bottom
+    ];
+    
+    intersectionPoints.forEach(point => {
+        for (let i = 0; i < 10; i++) {
+            points.push({
+                x: point.x + (Math.random() - 0.5) * thickness,
+                y: point.y + (Math.random() - 0.5) * thickness
+            });
+        }
+    });
+    
+    return points;
+}
+
+function generateLetterK(centerX, centerY, width, height, thickness) {
+    const points = [];
+    const segments = 50; // Reduced for more concentrated points
+    
+    // Helper function to add points along a line with controlled randomness
+    function addLinePoints(x1, y1, x2, y2, count) {
+        for (let i = 0; i < count; i++) {
+            const t = i / (count - 1);
+            const randX = (Math.random() - 0.5) * thickness;
+            const randY = (Math.random() - 0.5) * thickness;
+            points.push({
+                x: x1 + (x2 - x1) * t + randX,
+                y: y1 + (y2 - y1) * t + randY
+            });
+        }
+    }
+    
+    const stemX = centerX - width/4;
+    const topY = centerY + height/2;
+    const bottomY = centerY - height/2;
+    const middleY = centerY;
+    const rightX = centerX + width/2;
+    
+    // Vertical stem
+    addLinePoints(stemX, topY, stemX, bottomY, segments * 2);
+    
+    // Upper diagonal
+    addLinePoints(stemX, middleY, rightX, topY, segments);
+    
+    // Lower diagonal
+    addLinePoints(stemX, middleY, rightX, bottomY, segments);
+    
+    // Add extra points at intersections for better definition
+    for (let i = 0; i < 10; i++) {
+        points.push({
+            x: stemX + (Math.random() - 0.5) * thickness,
+            y: middleY + (Math.random() - 0.5) * thickness
+        });
+    }
+    
+    return points;
+}
+
+// Modify the particle initialization in init()
 function init() {
     // Three.js setup
     scene = new THREE.Scene();
@@ -260,12 +356,29 @@ function init() {
     const positions = new Float32Array(PARTICLE_COUNT * 3);
     const geometry = new THREE.BufferGeometry();
 
+    // Generate points for WK
+    const letterPoints = [
+        ...generateLetterW(-0.3, 0, 0.7, 0.5, 0.01), // Adjusted width and height
+        ...generateLetterK(0.3, 0, 0.6, 0.6, 0.01)
+    ];
+
     // Initialize particles
     for (let i = 0; i < PARTICLE_COUNT * 3; i += 3) {
-        positions[i] = Math.random() * 2 - 1;     // x in [-1, 1]
-        positions[i + 1] = Math.random() * 2 - 1; // y in [-1, 1]
-        positions[i + 2] = 0;                     // z
+        if (i/3 < letterPoints.length) {
+            // Use letter points for the first portion of particles
+            positions[i] = letterPoints[i/3].x;
+            positions[i + 1] = letterPoints[i/3].y;
+            positions[i + 2] = 0;
+        } else {
+            // Distribute remaining particles randomly around the letters
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 0.2 + 0.75;
+            positions[i] = Math.cos(angle) * radius;
+            positions[i + 1] = Math.sin(angle) * radius;
+            positions[i + 2] = 0;
+        }
     }
+
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     const material = new THREE.PointsMaterial({ color: 0xffffff, size: 0.003, sizeAttenuation: true });

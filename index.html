@@ -42,24 +42,8 @@
     <div id="controls">
         <h2>Chladni Pattern Controls</h2>
         <div class="slider-container">
-            <label for="mSlider">m parameter:</label>
-            <input type="range" id="mSlider" min="1" max="16" value="8" step="1">
-        </div>
-        <div class="slider-container">
-            <label for="nSlider">n parameter:</label>
-            <input type="range" id="nSlider" min="1" max="16" value="4" step="1">
-        </div>
-        <div class="slider-container">
-            <label for="aSlider">a coefficient:</label>
-            <input type="range" id="aSlider" min="-2" max="2" value="1" step="0.1">
-        </div>
-        <div class="slider-container">
-            <label for="bSlider">b coefficient:</label>
-            <input type="range" id="bSlider" min="-2" max="2" value="1" step="0.1">
-        </div>
-        <div class="slider-container">
-            <label for="vSlider">Vibration strength:</label>
-            <input type="range" id="vSlider" min="0.01" max="0.1" value="0.02" step="0.01">
+            <label for="freqSlider">Frequency (Hz):</label>
+            <input type="range" id="freqSlider" min="50" max="1000" value="440" step="10">
         </div>
         <button id="toggleSound">Start/Stop Sound</button>
     </div>

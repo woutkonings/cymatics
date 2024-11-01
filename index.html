@@ -43,7 +43,11 @@
         <h2>Chladni Pattern Controls</h2>
         <div class="slider-container">
             <label for="freqSlider">Frequency (Hz):</label>
-            <input type="range" id="freqSlider" min="50" max="1000" value="440" step="10">
+            <input type="range" id="freqSlider" min="50" max="5000" value="440" step="1">
+        </div>
+        <div class="slider-container">
+            <label for="numberOfParticles">Number of Particles:</label>
+            <input type="range" id="numberOfParticles" min="1000" max="40000" value="20000" step="100">
         </div>
         <button id="toggleSound">Start/Stop Sound</button>
     </div>

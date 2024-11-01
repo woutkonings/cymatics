@@ -47,6 +47,7 @@ function init() {
     window.addEventListener('resize', onWindowResize, false);
     document.getElementById('toggleSound').addEventListener('click', toggleSound);
     document.getElementById('freqSlider').addEventListener('input', updateFrequency);
+    document.getElementById('numberOfParticles').addEventListener('input', updateParticleCount);
 
     initAudio();
     animate();
@@ -95,7 +96,7 @@ function animate() {
     // Calculate m and n from the current oscillator frequency
     const frequency = oscillator ? oscillator.frequency.value : 440;
     const minFrequency = 50;
-    const maxFrequency = 1000;
+    const maxFrequency = 5000;
     const scaleFactor = 2; // Controls how fast complexity increases with frequency
     const maxM = 16;
 
@@ -148,6 +149,43 @@ function updateFrequency(event) {
     if (oscillator) {
         oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
     }
+}
+
+// Update particle count while preserving existing particles
+function updateParticleCount(event) {
+    const newCount = parseInt(event.target.value);
+    const currentPositions = particles.geometry.attributes.position.array;
+    const currentCount = currentPositions.length / 3;
+    
+    // Create new positions array with new particle count
+    const positions = new Float32Array(newCount * 3);
+    
+    // Copy existing particles
+    const minCount = Math.min(newCount, currentCount);
+    for (let i = 0; i < minCount * 3; i++) {
+        positions[i] = currentPositions[i];
+    }
+    
+    // If we're adding particles, initialize only the new ones
+    if (newCount > currentCount) {
+        for (let i = currentCount * 3; i < newCount * 3; i += 3) {
+            positions[i] = Math.random() * 2 - 1;     // x in [-1, 1]
+            positions[i + 1] = Math.random() * 2 - 1; // y in [-1, 1]
+            positions[i + 2] = 0;                     // z
+        }
+    }
+    
+    // Update geometry with new positions
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    // Keep the same material
+    const oldMaterial = particles.material;
+    
+    // Remove old particles and add new ones
+    scene.remove(particles);
+    particles = new THREE.Points(geometry, oldMaterial);
+    scene.add(particles);
 }
 
 init();

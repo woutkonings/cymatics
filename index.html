@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cymatics Simulator - Chladni (Three.js)</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #191919;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        .slider-container {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 200px;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h2>Chladni Pattern Controls</h2>
+        <div class="slider-container">
+            <label for="mSlider">m parameter:</label>
+            <input type="range" id="mSlider" min="1" max="16" value="8" step="1">
+        </div>
+        <div class="slider-container">
+            <label for="nSlider">n parameter:</label>
+            <input type="range" id="nSlider" min="1" max="16" value="4" step="1">
+        </div>
+        <div class="slider-container">
+            <label for="aSlider">a coefficient:</label>
+            <input type="range" id="aSlider" min="-2" max="2" value="1" step="0.1">
+        </div>
+        <div class="slider-container">
+            <label for="bSlider">b coefficient:</label>
+            <input type="range" id="bSlider" min="-2" max="2" value="1" step="0.1">
+        </div>
+        <div class="slider-container">
+            <label for="vSlider">Vibration strength:</label>
+            <input type="range" id="vSlider" min="0.01" max="0.1" value="0.02" step="0.01">
+        </div>
+        <button id="toggleSound">Start/Stop Sound</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

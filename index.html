@@ -31,10 +31,52 @@
         input[type="range"] {
             width: 200px;
         }
-        canvas {
+        #keyboard {
             position: fixed;
-            top: 0;
-            left: 0;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2px;
+            background-color: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .key {
+            width: 40px;
+            height: 120px;
+            background: white;
+            border: 1px solid #000;
+            border-radius: 0 0 4px 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .key.black {
+            background: #000;
+            color: white;
+            height: 80px;
+            width: 30px;
+            margin: 0 -15px;
+            z-index: 1;
+        }
+        .key.active {
+            background: #7cb9e8;
+        }
+        .key.black.active {
+            background: #0066b2;
+        }
+        .key-binding {
+            font-size: 12px;
+            margin-top: 5px;
+            color: #666;
+        }
+        .black .key-binding {
+            color: #999;
         }
     </style>
 </head>
@@ -42,15 +84,11 @@
     <div id="controls">
         <h2>Chladni Pattern Controls</h2>
         <div class="slider-container">
-            <label for="freqSlider">Frequency (Hz):</label>
-            <input type="range" id="freqSlider" min="50" max="5000" value="440" step="1">
-        </div>
-        <div class="slider-container">
             <label for="numberOfParticles">Number of Particles:</label>
             <input type="range" id="numberOfParticles" min="1000" max="40000" value="20000" step="100">
         </div>
-        <button id="toggleSound">Start/Stop Sound</button>
     </div>
+    <div id="keyboard"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="script.js"></script>

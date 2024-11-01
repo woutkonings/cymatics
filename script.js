@@ -7,51 +7,54 @@ const PARTICLE_COUNT = 20000;
 const MIN_WALK = 0.002;
 
 // Define musical notes and their frequencies
+const A4 = 440;
 const NOTES = {
-    // Top number row
-    'C3': { freq: 130.81, key: '1' },
-    'C#3': { freq: 138.59, key: '2' },
-    'D3': { freq: 146.83, key: '3' },
-    'D#3': { freq: 155.56, key: '4' },
-    'E3': { freq: 164.81, key: '5' },
-    'F3': { freq: 174.61, key: '6' },
-    'F#3': { freq: 185.00, key: '7' },
-    'G3': { freq: 196.00, key: '8' },
-    'G#3': { freq: 207.65, key: '9' },
-    'A3': { freq: 220.00, key: '0' },
-    'A#3': { freq: 233.08, key: '-' },
-    'B3': { freq: 246.94, key: '=' },
-    // Q row
-    'C4': { freq: 261.63, key: 'Q' },
-    'C#4': { freq: 277.18, key: 'W' },
-    'D4': { freq: 293.66, key: 'E' },
-    'D#4': { freq: 311.13, key: 'R' },
-    'E4': { freq: 329.63, key: 'T' },
-    'F4': { freq: 349.23, key: 'Y' },
-    'F#4': { freq: 369.99, key: 'U' },
-    'G4': { freq: 392.00, key: 'I' },
-    'G#4': { freq: 415.30, key: 'O' },
-    'A4': { freq: 440.00, key: 'P' },
-    // A row
-    'A#4': { freq: 466.16, key: 'A' },
-    'B4': { freq: 493.88, key: 'S' },
-    'C5': { freq: 523.25, key: 'D' },
-    'C#5': { freq: 554.37, key: 'F' },
-    'D5': { freq: 587.33, key: 'G' },
-    'D#5': { freq: 622.25, key: 'H' },
-    'E5': { freq: 659.26, key: 'J' },
-    'F5': { freq: 698.46, key: 'K' },
-    'F#5': { freq: 739.99, key: 'L' },
-    // Z row
-    'G5': { freq: 783.99, key: 'Z' },
-    'G#5': { freq: 830.61, key: 'X' },
-    'A5': { freq: 880.00, key: 'C' },
-    'A#5': { freq: 932.33, key: 'V' },
-    'B5': { freq: 987.77, key: 'B' },
-    'C6': { freq: 1046.50, key: 'N' },
-    'C#6': { freq: 1108.73, key: 'M' },
-    'D6': { freq: 1174.66, key: ',' },
-    'D#6': { freq: 1244.51, key: '.' }
+    // Octave 3
+    'C3': { freq: A4 * Math.pow(2, -21/12), key: '1' },
+    'C#3': { freq: A4 * Math.pow(2, -20/12), key: '2' },
+    'D3': { freq: A4 * Math.pow(2, -19/12), key: '3' },
+    'D#3': { freq: A4 * Math.pow(2, -18/12), key: '4' },
+    'E3': { freq: A4 * Math.pow(2, -17/12), key: '5' },
+    'F3': { freq: A4 * Math.pow(2, -16/12), key: '6' },
+    'F#3': { freq: A4 * Math.pow(2, -15/12), key: '7' },
+    'G3': { freq: A4 * Math.pow(2, -14/12), key: '8' },
+    'G#3': { freq: A4 * Math.pow(2, -13/12), key: '9' },
+    'A3': { freq: A4 * Math.pow(2, -12/12), key: '0' },
+    'A#3': { freq: A4 * Math.pow(2, -11/12), key: '-' },
+    'B3': { freq: A4 * Math.pow(2, -10/12), key: '=' },
+    // Octave 4
+    'C4': { freq: A4 * Math.pow(2, -9/12), key: 'Q' },
+    'C#4': { freq: A4 * Math.pow(2, -8/12), key: 'W' },
+    'D4': { freq: A4 * Math.pow(2, -7/12), key: 'E' },
+    'D#4': { freq: A4 * Math.pow(2, -6/12), key: 'R' },
+    'E4': { freq: A4 * Math.pow(2, -5/12), key: 'T' },
+    'F4': { freq: A4 * Math.pow(2, -4/12), key: 'Y' },
+    'F#4': { freq: A4 * Math.pow(2, -3/12), key: 'U' },
+    'G4': { freq: A4 * Math.pow(2, -2/12), key: 'I' },
+    'G#4': { freq: A4 * Math.pow(2, -1/12), key: 'O' },
+    'A4': { freq: A4 * Math.pow(2, 0/12), key: 'P' },
+    // Octave 4 continued
+    'A#4': { freq: A4 * Math.pow(2, 1/12), key: 'A' },
+    'B4': { freq: A4 * Math.pow(2, 2/12), key: 'S' },
+    // Octave 5
+    'C5': { freq: A4 * Math.pow(2, 3/12), key: 'D' },
+    'C#5': { freq: A4 * Math.pow(2, 4/12), key: 'F' },
+    'D5': { freq: A4 * Math.pow(2, 5/12), key: 'G' },
+    'D#5': { freq: A4 * Math.pow(2, 6/12), key: 'H' },
+    'E5': { freq: A4 * Math.pow(2, 7/12), key: 'J' },
+    'F5': { freq: A4 * Math.pow(2, 8/12), key: 'K' },
+    'F#5': { freq: A4 * Math.pow(2, 9/12), key: 'L' },
+    // Octave 5 continued
+    'G5': { freq: A4 * Math.pow(2, 10/12), key: 'Z' },
+    'G#5': { freq: A4 * Math.pow(2, 11/12), key: 'X' },
+    'A5': { freq: A4 * Math.pow(2, 12/12), key: 'C' },
+    'A#5': { freq: A4 * Math.pow(2, 13/12), key: 'V' },
+    'B5': { freq: A4 * Math.pow(2, 14/12), key: 'B' },
+    // Octave 6
+    'C6': { freq: A4 * Math.pow(2, 15/12), key: 'N' },
+    'C#6': { freq: A4 * Math.pow(2, 16/12), key: 'M' },
+    'D6': { freq: A4 * Math.pow(2, 17/12), key: ',' },
+    'D#6': { freq: A4 * Math.pow(2, 18/12), key: '.' }
 };
 
 // Create keyboard UI
@@ -115,10 +118,22 @@ function createKeyboard() {
 function initAudio() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        // Create a master gain node that stays constant
+        
+        // Create compressor to help prevent distortion
+        const compressor = audioContext.createDynamicsCompressor();
+        compressor.threshold.setValueAtTime(-50, audioContext.currentTime);
+        compressor.knee.setValueAtTime(40, audioContext.currentTime);
+        compressor.ratio.setValueAtTime(12, audioContext.currentTime);
+        compressor.attack.setValueAtTime(0, audioContext.currentTime);
+        compressor.release.setValueAtTime(0.25, audioContext.currentTime);
+        
+        // Create master gain node
         gainNode = audioContext.createGain();
-        gainNode.gain.value = 0.05; // Reduced from 0.1 to prevent distortion
-        gainNode.connect(audioContext.destination);
+        gainNode.gain.value = 0.03; // Further reduced master volume
+        
+        // Connect nodes: gain -> compressor -> destination
+        gainNode.connect(compressor);
+        compressor.connect(audioContext.destination);
     }
 }
 
@@ -126,15 +141,17 @@ function createOscillator(frequency) {
     const osc = audioContext.createOscillator();
     const noteGain = audioContext.createGain();
     
-    // Configure oscillator
+    // Configure oscillator with more precise frequency control
     osc.type = 'sine';
     osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
     
-    // Configure note-specific gain for envelope
+    // Smoother envelope
     noteGain.gain.setValueAtTime(0, audioContext.currentTime);
-    noteGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.02); // Gentle attack
+    noteGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.03); // Slightly longer attack
     
-    // Connect oscillator through note gain to master gain
+    // Add a very slight detuning to make the sound more stable
+    osc.detune.setValueAtTime(-2, audioContext.currentTime);
+    
     osc.connect(noteGain);
     noteGain.connect(gainNode);
     
@@ -168,17 +185,16 @@ function stopNote() {
     if (activeOscillator) {
         const { oscillator, noteGain } = activeOscillator;
         
-        // Gentle release to prevent clicking
-        const releaseTime = audioContext.currentTime + 0.05;
+        // Longer, smoother release
+        const releaseTime = audioContext.currentTime + 0.1;
         noteGain.gain.linearRampToValueAtTime(0, releaseTime);
         
         // Schedule the oscillator to stop after the release
-        oscillator.stop(releaseTime);
+        oscillator.stop(releaseTime + 0.05);
         
         activeOscillator = null;
         isPlaying = false;
         
-        // Remove active class from all keys
         document.querySelectorAll('.key').forEach(key => 
             key.classList.remove('active')
         );

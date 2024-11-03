@@ -335,10 +335,11 @@ function init() {
         const loader = new THREE.FontLoader();
         
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_regular.typeface.json', function(font) {
-            const textGeometry = new THREE.TextGeometry('Did you enjoy this little demo? \n Please let me know!', {
+            const textGeometry = new THREE.TextGeometry('Did you enjoy this demo?\nPlease let me know!', {
                 font: font,
                 size: 0.1,
                 height: 0.02,
+                align: 'center' // Center align the text
             });
             
             const textMaterial = new THREE.MeshBasicMaterial({ 
@@ -349,7 +350,7 @@ function init() {
             // Center the text
             textGeometry.computeBoundingBox();
             const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-            textMesh.position.set(textWidth/2, 0.3, -0.02); // Positioned just behind the plane
+            textMesh.position.set(textWidth/2, 0.3, -0.02); // Center horizontally by offsetting by half width
             
             // Rotate text to face back
             textMesh.rotation.y = Math.PI;

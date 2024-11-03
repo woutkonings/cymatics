@@ -322,6 +322,35 @@ function init() {
     createKeyboard();
     initAudio();
     animate();
+
+    // Add this to your init function after creating the plane
+    function addSecretMessage() {
+        const loader = new THREE.FontLoader();
+        
+        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_regular.typeface.json', function(font) {
+            const textGeometry = new THREE.TextGeometry('Did you enjoy this little demo? \n Please let me know!', {
+                font: font,
+                size: 0.1,
+                height: 0.02,
+            });
+            
+            const textMaterial = new THREE.MeshBasicMaterial({ color: 0x444444 });
+            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+            
+            // Center the text
+            textGeometry.computeBoundingBox();
+            const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
+            textMesh.position.set(textWidth/2, 0.3, -0.02); // Positioned just behind the plane
+            
+            // Rotate text to face back
+            textMesh.rotation.y = Math.PI;
+            
+            scene.add(textMesh);
+        });
+    }
+
+    // Call addSecretMessage() at the end of init()
+    addSecretMessage();
 }
 
 // Chladni pattern function

@@ -6,6 +6,53 @@ let activeNote = null;
 const PARTICLE_COUNT = 20000;
 const MIN_WALK = 0.002;
 
+// Add this keyboard mapping object after the NOTES declaration
+const KEYBOARD_MAPPING = {
+    // First row: numbers
+    '1': 48,  // C3
+    '2': 49,  // C#3
+    '3': 50,  // D3
+    '4': 51,  // D#3
+    '5': 52,  // E3
+    '6': 53,  // F3
+    '7': 54,  // F#3
+    '8': 55,  // G3
+    '9': 56,  // G#3
+    '0': 57,  // A3
+    '-': 58,  // A#3
+    '=': 59,  // B3
+    // Second row: QWERTY
+    'q': 60,  // C4
+    'w': 61,  // C#4
+    'e': 62,  // D4
+    'r': 63,  // D#4
+    't': 64,  // E4
+    'y': 65,  // F4
+    'u': 66,  // F#4
+    'i': 67,  // G4
+    'o': 68,  // G#4
+    'p': 69,  // A4
+    // Third row: ASDF
+    'a': 70,  // A#4
+    's': 71,  // B4
+    'd': 72,  // C5
+    'f': 73,  // C#5
+    'g': 74,  // D5
+    'h': 75,  // D#5
+    'j': 76,  // E5
+    'k': 77,  // F5
+    'l': 78,  // F#5
+    // Fourth row: ZXCV
+    'z': 79,  // G5
+    'x': 80,  // G#5
+    'c': 81,  // A5
+    'v': 82,  // A#5
+    'b': 83,  // B5
+    'n': 84,  // C6
+    'm': 85,  // C#6
+    ',': 86,  // D6
+    '.': 87   // D#6
+};
 
 // Create keyboard UI
 function createKeyboard() {
@@ -15,6 +62,8 @@ function createKeyboard() {
         lowNote: 48,     // C3
         highNote: 84     // C6
     });
+
+    const pressedKeys = new Set();
 
     keyboard.on('change', (note) => {
         if (!synth) initAudio();
@@ -39,18 +88,24 @@ function createKeyboard() {
     // Computer keyboard support
     document.addEventListener('keydown', (e) => {
         if (e.repeat) return;
-        const note = keyboard.getKeyFromComputer(e);
-        if (note) {
-            keyboard.toggleKey(note, true);
+        const key = e.key.toLowerCase();
+        if (KEYBOARD_MAPPING[key] && !pressedKeys.has(key)) {
+            pressedKeys.add(key);
+            const midiNote = KEYBOARD_MAPPING[key];
+            keyboard.toggleKey(midiNote, true);
         }
     });
 
     document.addEventListener('keyup', (e) => {
-        const note = keyboard.getKeyFromComputer(e);
-        if (note) {
-            keyboard.toggleKey(note, false);
+        const key = e.key.toLowerCase();
+        if (KEYBOARD_MAPPING[key]) {
+            pressedKeys.delete(key);
+            const midiNote = KEYBOARD_MAPPING[key];
+            keyboard.toggleKey(midiNote, false);
         }
     });
+
+    return keyboard;
 }
 
 // Replace our audio initialization with Tone.js

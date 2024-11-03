@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cymatics Simulator - Chladni (Three.js)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nexusui@2.1.6/dist/NexusUI.js"></script>
     <style>
         body {
             margin: 0;
@@ -36,47 +38,15 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            gap: 2px;
             background-color: rgba(0,0,0,0.4);
             padding: 20px;
             border-radius: 5px;
+            z-index: 1000;
         }
-        .key {
-            width: 40px;
-            height: 120px;
-            background: white;
-            border: 1px solid #000;
-            border-radius: 0 0 4px 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            padding-bottom: 10px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .key.black {
-            background: #000;
-            color: white;
-            height: 80px;
-            width: 30px;
-            margin: 0 -15px;
-            z-index: 1;
-        }
-        .key.active {
-            background: #7cb9e8;
-        }
-        .key.black.active {
-            background: #0066b2;
-        }
-        .key-binding {
-            font-size: 12px;
-            margin-top: 5px;
-            color: #666;
-        }
-        .black .key-binding {
-            color: #999;
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>

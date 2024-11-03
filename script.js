@@ -1,206 +1,72 @@
 let scene, camera, renderer, particles, controls;
-let audioContext, gainNode, isPlaying = false;
-let activeOscillator = null;
+let synth;
+let isPlaying = false;
 let activeNote = null;
 
 const PARTICLE_COUNT = 20000;
 const MIN_WALK = 0.002;
 
-// Define musical notes and their frequencies
-const A4 = 440;
-const NOTES = {
-    // Octave 3
-    'C3': { freq: A4 * Math.pow(2, -21/12), key: '1' },
-    'C#3': { freq: A4 * Math.pow(2, -20/12), key: '2' },
-    'D3': { freq: A4 * Math.pow(2, -19/12), key: '3' },
-    'D#3': { freq: A4 * Math.pow(2, -18/12), key: '4' },
-    'E3': { freq: A4 * Math.pow(2, -17/12), key: '5' },
-    'F3': { freq: A4 * Math.pow(2, -16/12), key: '6' },
-    'F#3': { freq: A4 * Math.pow(2, -15/12), key: '7' },
-    'G3': { freq: A4 * Math.pow(2, -14/12), key: '8' },
-    'G#3': { freq: A4 * Math.pow(2, -13/12), key: '9' },
-    'A3': { freq: A4 * Math.pow(2, -12/12), key: '0' },
-    'A#3': { freq: A4 * Math.pow(2, -11/12), key: '-' },
-    'B3': { freq: A4 * Math.pow(2, -10/12), key: '=' },
-    // Octave 4
-    'C4': { freq: A4 * Math.pow(2, -9/12), key: 'Q' },
-    'C#4': { freq: A4 * Math.pow(2, -8/12), key: 'W' },
-    'D4': { freq: A4 * Math.pow(2, -7/12), key: 'E' },
-    'D#4': { freq: A4 * Math.pow(2, -6/12), key: 'R' },
-    'E4': { freq: A4 * Math.pow(2, -5/12), key: 'T' },
-    'F4': { freq: A4 * Math.pow(2, -4/12), key: 'Y' },
-    'F#4': { freq: A4 * Math.pow(2, -3/12), key: 'U' },
-    'G4': { freq: A4 * Math.pow(2, -2/12), key: 'I' },
-    'G#4': { freq: A4 * Math.pow(2, -1/12), key: 'O' },
-    'A4': { freq: A4 * Math.pow(2, 0/12), key: 'P' },
-    // Octave 4 continued
-    'A#4': { freq: A4 * Math.pow(2, 1/12), key: 'A' },
-    'B4': { freq: A4 * Math.pow(2, 2/12), key: 'S' },
-    // Octave 5
-    'C5': { freq: A4 * Math.pow(2, 3/12), key: 'D' },
-    'C#5': { freq: A4 * Math.pow(2, 4/12), key: 'F' },
-    'D5': { freq: A4 * Math.pow(2, 5/12), key: 'G' },
-    'D#5': { freq: A4 * Math.pow(2, 6/12), key: 'H' },
-    'E5': { freq: A4 * Math.pow(2, 7/12), key: 'J' },
-    'F5': { freq: A4 * Math.pow(2, 8/12), key: 'K' },
-    'F#5': { freq: A4 * Math.pow(2, 9/12), key: 'L' },
-    // Octave 5 continued
-    'G5': { freq: A4 * Math.pow(2, 10/12), key: 'Z' },
-    'G#5': { freq: A4 * Math.pow(2, 11/12), key: 'X' },
-    'A5': { freq: A4 * Math.pow(2, 12/12), key: 'C' },
-    'A#5': { freq: A4 * Math.pow(2, 13/12), key: 'V' },
-    'B5': { freq: A4 * Math.pow(2, 14/12), key: 'B' },
-    // Octave 6
-    'C6': { freq: A4 * Math.pow(2, 15/12), key: 'N' },
-    'C#6': { freq: A4 * Math.pow(2, 16/12), key: 'M' },
-    'D6': { freq: A4 * Math.pow(2, 17/12), key: ',' },
-    'D#6': { freq: A4 * Math.pow(2, 18/12), key: '.' }
-};
 
 // Create keyboard UI
 function createKeyboard() {
-    const keyboard = document.getElementById('keyboard');
-    Object.entries(NOTES).forEach(([note, data]) => {
-        const isSharp = note.includes('#');
-        const key = document.createElement('div');
-        key.className = `key ${isSharp ? 'black' : 'white'}`;
-        key.dataset.note = note;
-        key.innerHTML = `${note}<div class="key-binding">${data.key}</div>`;
-        
-        // Mouse events
-        key.addEventListener('mousedown', () => playNote(note));
-        key.addEventListener('mouseup', stopNote);
-        key.addEventListener('mouseleave', stopNote);
-        
-        keyboard.appendChild(key);
+    const keyboard = new Nexus.Piano('#keyboard', {
+        size: [800, 150],
+        mode: 'button',
+        lowNote: 48,     // C3
+        highNote: 84     // C6
     });
 
-    // Keep track of currently pressed keys
-    const pressedKeys = new Set();
+    keyboard.on('change', (note) => {
+        if (!synth) initAudio();
+        
+        const freq = Tone.Frequency(note.note, "midi").toFrequency();
+        
+        if (note.state) {
+            // Note pressed
+            synth.triggerAttack(freq);
+            isPlaying = true;
+            activeNote = freq;
+        } else {
+            // Note released
+            synth.triggerRelease(freq);
+            if (!keyboard.keys.some(k => k.state)) {
+                isPlaying = false;
+                activeNote = null;
+            }
+        }
+    });
 
-    // Keyboard events
+    // Computer keyboard support
     document.addEventListener('keydown', (e) => {
-        if (e.repeat) return; // Prevent key repeat
-        
-        const note = Object.entries(NOTES).find(([_, data]) => 
-            data.key.toLowerCase() === e.key.toLowerCase()
-        )?.[0];
-        
+        if (e.repeat) return;
+        const note = keyboard.getKeyFromComputer(e);
         if (note) {
-            pressedKeys.add(e.key.toLowerCase());
-            playNote(note);
+            keyboard.toggleKey(note, true);
         }
     });
 
     document.addEventListener('keyup', (e) => {
-        const note = Object.entries(NOTES).find(([_, data]) => 
-            data.key.toLowerCase() === e.key.toLowerCase()
-        )?.[0];
-        
-        pressedKeys.delete(e.key.toLowerCase());
-        
-        if (note && pressedKeys.size === 0) {
-            // Only stop the sound if no other keys are pressed
-            stopNote();
-        } else if (pressedKeys.size > 0) {
-            // If there are still keys pressed, play the last pressed note
-            const lastPressedKey = Array.from(pressedKeys).pop();
-            const lastNote = Object.entries(NOTES).find(([_, data]) => 
-                data.key.toLowerCase() === lastPressedKey
-            )?.[0];
-            if (lastNote) {
-                playNote(lastNote);
-            }
+        const note = keyboard.getKeyFromComputer(e);
+        if (note) {
+            keyboard.toggleKey(note, false);
         }
     });
 }
 
+// Replace our audio initialization with Tone.js
 function initAudio() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create compressor to help prevent distortion
-        const compressor = audioContext.createDynamicsCompressor();
-        compressor.threshold.setValueAtTime(-50, audioContext.currentTime);
-        compressor.knee.setValueAtTime(40, audioContext.currentTime);
-        compressor.ratio.setValueAtTime(12, audioContext.currentTime);
-        compressor.attack.setValueAtTime(0, audioContext.currentTime);
-        compressor.release.setValueAtTime(0.25, audioContext.currentTime);
-        
-        // Create master gain node
-        gainNode = audioContext.createGain();
-        gainNode.gain.value = 0.03; // Further reduced master volume
-        
-        // Connect nodes: gain -> compressor -> destination
-        gainNode.connect(compressor);
-        compressor.connect(audioContext.destination);
-    }
-}
-
-function createOscillator(frequency) {
-    const osc = audioContext.createOscillator();
-    const noteGain = audioContext.createGain();
-    
-    // Configure oscillator with more precise frequency control
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
-    
-    // Smoother envelope
-    noteGain.gain.setValueAtTime(0, audioContext.currentTime);
-    noteGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.03); // Slightly longer attack
-    
-    // Add a very slight detuning to make the sound more stable
-    osc.detune.setValueAtTime(-2, audioContext.currentTime);
-    
-    osc.connect(noteGain);
-    noteGain.connect(gainNode);
-    
-    return { oscillator: osc, noteGain: noteGain };
-}
-
-function playNote(note) {
-    if (!audioContext) initAudio();
-    
-    // Stop previous note if any
-    if (activeOscillator) {
-        stopNote();
-    }
-
-    const frequency = NOTES[note].freq;
-    const { oscillator, noteGain } = createOscillator(frequency);
-    activeOscillator = { 
-        oscillator: oscillator, 
-        noteGain: noteGain 
-    };
-    
-    oscillator.start();
-    isPlaying = true;
-    activeNote = note;
-
-    // Update UI
-    document.querySelector(`[data-note="${note}"]`).classList.add('active');
-}
-
-function stopNote() {
-    if (activeOscillator) {
-        const { oscillator, noteGain } = activeOscillator;
-        
-        // Longer, smoother release
-        const releaseTime = audioContext.currentTime + 0.1;
-        noteGain.gain.linearRampToValueAtTime(0, releaseTime);
-        
-        // Schedule the oscillator to stop after the release
-        oscillator.stop(releaseTime + 0.05);
-        
-        activeOscillator = null;
-        isPlaying = false;
-        
-        document.querySelectorAll('.key').forEach(key => 
-            key.classList.remove('active')
-        );
-        
-        activeNote = null;
-    }
+    synth = new Tone.PolySynth(Tone.Synth, {
+        oscillator: {
+            type: "sine"
+        },
+        envelope: {
+            attack: 0.03,
+            decay: 0.1,
+            sustain: 0.3,
+            release: 0.1
+        },
+        volume: -12
+    }).toDestination();
 }
 
 // Update particle positions based on frequency-driven parameters
@@ -232,7 +98,6 @@ function updateParticles(m, n) {
     particles.geometry.attributes.position.needsUpdate = true;
 }
 
-// Add these functions after the NOTES definition and before init()
 
 function generateLetterW(centerX, centerY, width, height, thickness) {
     const points = [];
@@ -407,11 +272,11 @@ function animate() {
     requestAnimationFrame(animate);
     controls.update();
     
-    // Calculate m and n from the current oscillator frequency
-    const frequency = activeOscillator ? activeOscillator.oscillator.frequency.value : 440;
+    // Calculate m and n from the current frequency
+    const frequency = activeNote || 440;
     const minFrequency = 130.81;  // C3
     const maxFrequency = 1244.51; // D#6
-    const scaleFactor = 2; // Controls how fast complexity increases with frequency
+    const scaleFactor = 2;
     const maxM = 16;
 
     const m1 = Math.floor((frequency - minFrequency) / (maxFrequency - minFrequency) * maxM) + 1;

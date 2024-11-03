@@ -1,7 +1,7 @@
 let scene, camera, renderer, particles, controls;
 let synth;
 let isPlaying = false;
-let activeNote = null;
+let activeNotes = new Map(); // Map to store all currently playing notes and their frequencies
 
 const PARTICLE_COUNT = 20000;
 const MIN_WALK = 0.002;
@@ -73,14 +73,14 @@ function createKeyboard() {
         if (note.state) {
             // Note pressed
             synth.triggerAttack(freq);
+            activeNotes.set(note.note, freq);
             isPlaying = true;
-            activeNote = freq;
         } else {
             // Note released
             synth.triggerRelease(freq);
-            if (!keyboard.keys.some(k => k.state)) {
+            activeNotes.delete(note.note);
+            if (activeNotes.size === 0) {
                 isPlaying = false;
-                activeNote = null;
             }
         }
     });
@@ -125,7 +125,7 @@ function initAudio() {
 }
 
 // Update particle positions based on frequency-driven parameters
-function updateParticles(m, n) {
+function updateParticles(patterns) {
     const positions = particles.geometry.attributes.position.array;
     const a = 1, b = 1;
     const vibrationStrength = isPlaying ? 0.02 : 0;
@@ -133,11 +133,20 @@ function updateParticles(m, n) {
     for (let i = 0; i < positions.length; i += 3) {
         let x = positions[i];
         let y = positions[i + 1];
-        const eq = chladniFunction(x, y, a, b, m, n);
-        let amplitude = vibrationStrength * Math.abs(eq);
-        if (isPlaying && amplitude <= MIN_WALK) amplitude = MIN_WALK;
-
+        
+        // Average the Chladni patterns for all active notes
+        let totalEq = 0;
+        if (patterns.length > 0) {
+            totalEq = patterns.reduce((sum, pattern) => {
+                return sum + chladniFunction(x, y, a, b, pattern.m, pattern.n);
+            }, 0) / patterns.length;
+        }
+        
+        let amplitude = vibrationStrength * Math.abs(totalEq);
+        
         if (isPlaying) {
+            if (amplitude <= MIN_WALK) amplitude = MIN_WALK;
+
             x += (Math.random() - 0.5) * amplitude * 2;
             y += (Math.random() - 0.5) * amplitude * 2;
             x = Math.max(-1, Math.min(1, x));
@@ -150,6 +159,7 @@ function updateParticles(m, n) {
         positions[i + 1] = y;
         positions[i + 2] = z;
     }
+    
     particles.geometry.attributes.position.needsUpdate = true;
 }
 
@@ -327,23 +337,31 @@ function animate() {
     requestAnimationFrame(animate);
     controls.update();
     
-    // Calculate m and n from the current frequency
-    const frequency = activeNote || 440;
-    const minFrequency = 130.81;  // C3
-    const maxFrequency = 1244.51; // D#6
-    const scaleFactor = 2;
-    const maxM = 16;
+    if (activeNotes.size > 0) {
+        const frequencies = Array.from(activeNotes.values());
+        const patterns = frequencies.map(freq => {
+            const minFrequency = 130.81;  // C3
+            const maxFrequency = 1244.51; // D#6
+            const scaleFactor = 2;
+            const maxM = 16;
 
-    const m1 = Math.floor((frequency - minFrequency) / (maxFrequency - minFrequency) * maxM) + 1;
-    const n1 = Math.floor((frequency - minFrequency) / (maxFrequency - minFrequency) * (maxM / 2)) + 1;
+            const m1 = Math.floor((freq - minFrequency) / (maxFrequency - minFrequency) * maxM) + 1;
+            const n1 = Math.floor((freq - minFrequency) / (maxFrequency - minFrequency) * (maxM / 2)) + 1;
 
-    const m2 = Math.floor(scaleFactor * Math.log2(frequency / minFrequency)) + 1;
-    const n2 = Math.floor((scaleFactor / 2) * Math.log2(frequency / minFrequency)) + 1;
+            const m2 = Math.floor(scaleFactor * Math.log2(freq / minFrequency)) + 1;
+            const n2 = Math.floor((scaleFactor / 2) * Math.log2(freq / minFrequency)) + 1;
 
-    m = (m1 + m2) / 2;
-    n = (n1 + n2) / 2;
-
-    updateParticles(m, n);
+            return {
+                m: (m1 + m2) / 2,
+                n: (n1 + n2) / 2
+            };
+        });
+        
+        updateParticles(patterns);
+    } else {
+        updateParticles([]);
+    }
+    
     renderer.render(scene, camera);
 }
 

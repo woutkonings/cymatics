@@ -6,6 +6,8 @@
     <title>Cymatics Simulator - Chladni (Three.js)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/nexusui@2.1.6/dist/NexusUI.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -115,21 +117,60 @@
             color: #00ffff !important;
             text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
         }
+
+        /* Style the intro.js tooltips to match our theme */
+        .introjs-tooltip {
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.9), rgba(0, 255, 255, 0.9));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            color: white;
+        }
+
+        .introjs-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            text-shadow: none;
+            border-radius: 10px;
+        }
+
+        .introjs-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <div id="controls">
+    <div id="controls" data-intro="Adjust the number of particles to change the density of the visualization" data-step="3">
         <h2>Controls</h2>
         <div class="slider-container">
             <label for="numberOfParticles">Number of Particles:</label>
             <input type="range" id="numberOfParticles" min="1000" max="40000" value="20000" step="100">
         </div>
     </div>
-    <div id="keyboard"></div>
+    <div id="keyboard" data-intro="Play notes by clicking the piano keys or using your computer keyboard. Try playing multiple notes at once!" data-step="2"></div>
+    <canvas></canvas>
+    <!-- Add this after the canvas element -->
+    <div id="visualization-area" style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 600px;
+        pointer-events: none;
+        z-index: 999;
+    "></div>
+    <!-- Load libraries first -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nexusui@2.1.6/dist/NexusUI.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.js"></script>
+    
     <script src="script.js"></script>
 </body>
 </html>

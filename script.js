@@ -361,6 +361,9 @@ function init() {
 
     // Call addSecretMessage() at the end of init()
     addSecretMessage();
+    
+    // Start tutorial after a short delay
+    setTimeout(startTutorial, 1000);
 }
 
 // Chladni pattern function
@@ -446,6 +449,45 @@ function updateParticleCount(event) {
     scene.remove(particles);
     particles = new THREE.Points(geometry, oldMaterial);
     scene.add(particles);
+}
+
+// Modify the startTutorial function
+function startTutorial() {
+    if (localStorage.getItem('tutorialShown')) {
+        return;
+    }
+
+    const intro = introJs();
+    
+    intro.setOptions({
+        steps: [
+            {
+                element: document.querySelector('#visualization-area'),
+                intro: "Click and drag to rotate the view. Use mouse wheel to zoom in/out.",
+                position: 'right'
+            },
+            {
+                element: document.querySelector('#keyboard'),
+                intro: "Play notes by clicking the piano keys or using your computer keyboard. Try playing multiple notes at once!",
+                position: 'top'
+            },
+            {
+                element: document.querySelector('#controls'),
+                intro: "Adjust the number of particles to change the density of the visualization",
+                position: 'right'
+            }
+        ],
+        showProgress: true,
+        showBullets: false,
+        overlayOpacity: 0.7,
+        exitOnOverlayClick: false,
+        exitOnEsc: false
+    });
+
+    intro.oncomplete(() => localStorage.setItem('tutorialShown', 'true'));
+    intro.onexit(() => localStorage.setItem('tutorialShown', 'true'));
+    
+    intro.start();
 }
 
 init();

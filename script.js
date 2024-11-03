@@ -265,7 +265,7 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x191919);
+    renderer.setClearColor(0x1a0033); // Dark purple background
     document.body.appendChild(renderer.domElement);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -277,7 +277,10 @@ function init() {
 
     // Add a plane behind particles
     const planeGeometry = new THREE.PlaneGeometry(2, 2);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide });
+    const planeMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0x330066,  // Darker purple for the plane
+        side: THREE.DoubleSide 
+    });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.position.z = -0.01;
     scene.add(plane);
@@ -311,7 +314,11 @@ function init() {
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    const material = new THREE.PointsMaterial({ color: 0xffffff, size: 0.003, sizeAttenuation: true });
+    const material = new THREE.PointsMaterial({ 
+        color: 0x00ffff,  // Cyan particles
+        size: 0.003, 
+        sizeAttenuation: true 
+    });
     particles = new THREE.Points(geometry, material);
     scene.add(particles);
 
@@ -334,7 +341,9 @@ function init() {
                 height: 0.02,
             });
             
-            const textMaterial = new THREE.MeshBasicMaterial({ color: 0x444444 });
+            const textMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xff00ff  // Magenta text
+            });
             const textMesh = new THREE.Mesh(textGeometry, textMaterial);
             
             // Center the text

@@ -10,43 +10,109 @@
         body {
             margin: 0;
             overflow: hidden;
-            background: #191919;
-            color: white;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #1a0033, #000066);
+            color: #fff;
+            font-family: 'Arial', sans-serif;
         }
+        
         #controls {
             position: fixed;
             top: 20px;
             left: 20px;
-            background-color: rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(0, 255, 255, 0.2));
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 15px;
             z-index: 1000;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
         }
+
+        h2 {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            margin-top: 0;
+        }
+
         .slider-container {
-            margin: 10px 0;
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: #ff00ff;
+            font-weight: bold;
         }
+
         input[type="range"] {
             width: 200px;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            border-radius: 4px;
+            outline: none;
         }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
         #keyboard {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(0, 255, 255, 0.2));
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 15px;
             z-index: 1000;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
         }
+
         canvas {
             position: fixed;
             top: 0;
             left: 0;
+        }
+
+        /* Style Nexus Piano keys */
+        #keyboard .key {
+            background: linear-gradient(180deg, #ffffff, #e0e0e0) !important;
+            border: 1px solid #999 !important;
+        }
+
+        #keyboard .black {
+            background: linear-gradient(180deg, #333333, #000000) !important;
+        }
+
+        #keyboard .key.active {
+            background: linear-gradient(180deg, #00ffff, #0088ff) !important;
+        }
+
+        #keyboard .black.active {
+            background: linear-gradient(180deg, #ff00ff, #8800ff) !important;
+        }
+
+        .key-label {
+            color: #ff00ff !important;
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.5) !important;
+        }
+
+        .black .key-label {
+            color: #00ffff !important;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
         }
     </style>
 </head>
